@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Authentication</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Registration Form -->
+    <div class="container" id="registerContainer">
+        <h2>Register</h2>
+        <input type="text" id="regUsername" placeholder="Enter Username" required>
+        <input type="password" id="regPassword" placeholder="Enter Password" required>
+        <button onclick="register()">Register</button>
+        <p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+    </div>
+
+    <!-- Login Form -->
+    <div class="container hidden" id="loginContainer">
+        <h2>Login</h2>
+        <input type="text" id="loginUsername" placeholder="Enter Username" required>
+        <input type="password" id="loginPassword" placeholder="Enter Password" required>
+        <button onclick="login()">Login</button>
+        <p>Don't have an account? <a href="#" onclick="showRegister()">Register here</a></p>
+    </div>
+
+    <!-- Dashboard (Secured Page) -->
+    <div class="container hidden" id="dashboard">
+        <h2>Welcome, <span id="userDisplay"></span>!</h2>
+        <p>You have successfully logged in.</p>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        // Show Login Form
+        function showLogin() {
+            document.getElementById("registerContainer").classList.add("hidden");
+            document.getElementById("loginContainer").classList.remove("hidden");
+        }
+
+        // Show Register Form
+        function showRegister() {
+            document.getElementById("loginContainer").classList.add("hidden");
+            document.getElementById("registerContainer").classList.remove("hidden");
+        }
+
+        // User Registration
+        function register() {
+            let username = document.getElementById("regUsername").value;
+            let password = document.getElementById("regPassword").value;
+
+            if (username === "" || password === "") {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            if (localStorage.getItem(username)) {
+                alert("Username already exists. Choose a different one.");
+            } else {
+                localStorage.setItem(username, password);
+                alert("Registration successful! Please login.");
+                showLogin();
+            }
+        }
+
+        // User Login
+        function login() {
+            let username = document.getElementById("loginUsername").value;
+            let password = document.getElementById("loginPassword").value;
+
+            let storedPassword = localStorage.getItem(username);
+
+            if (storedPassword && storedPassword === password) {
+                sessionStorage.setItem("loggedInUser", username);
+                loadDashboard();
+            } else {
+                alert("Invalid username or password.");
+            }
+        }
+
+        // Load Dashboard if User is Logged In
+        function loadDashboard() {
+            let user = sessionStorage.getItem("loggedInUser");
+
+            if (user) {
+                document.getElementById("userDisplay").textContent = user;
+                document.getElementById("registerContainer").classList.add("hidden");
+                document.getElementById("loginContainer").classList.add("hidden");
+                document.getElementById("dashboard").classList.remove("hidden");
+            }
+        }
+
+        // Logout
+        function logout() {
+            sessionStorage.removeItem("loggedInUser");
+            document.getElementById("dashboard").classList.add("hidden");
+            showLogin();
+        }
+
+        // Check if user is logged in on page load
+        window.onload = loadDashboard;
+    </script>
+
+</body>
+</html>
